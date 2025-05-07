@@ -10,11 +10,11 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import InstructorTabBar from '../../components/InstructorTabBar';
 import Header from '../../components/Header';
-import StatisticsChart from '../../components/StatisticsChart';
 import TrendChart from '../../components/TrendChart';
 import InstructorCourses from './InstructorCourses';
 import QRCodeGenerator from './QRCode';
 import { API_URL } from '../../config/api';
+import { Ionicons } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
 
@@ -108,34 +108,32 @@ const InstructorDashboard = () => {
                 title="Attendance Rate (Last 7 Days)"
               />
             </View>
-            <StatisticsChart
-              stats={[
-                {
-                  icon: 'people-outline',
-                  value: statistics.totalStudents,
-                  label: 'Total Students',
-                  backgroundColor: '#165973',
-                },
-                {
-                  icon: 'book-outline',
-                  value: statistics.totalCourses,
-                  label: 'Total Courses',
-                  backgroundColor: '#7FB3D1',
-                },
-                {
-                  icon: 'school-outline',
-                  value: statistics.activeClasses,
-                  label: 'Active Classes',
-                  backgroundColor: '#165973',
-                },
-                {
-                  icon: 'stats-chart',
-                  value: `${statistics.attendanceRate}%`,
-                  label: 'Attendance Rate',
-                  backgroundColor: '#7FB3D1',
-                }
-              ]}
-            />
+            <View style={styles.statsContainer}>
+              <View style={styles.statsRow}>
+                <View style={[styles.statCard, { backgroundColor: '#165973' }]}>
+                  <Ionicons name="people-outline" size={28} color="#fff" />
+                  <Text style={styles.statValue}>{statistics.totalStudents}</Text>
+                  <Text style={styles.statLabel}>Total Students</Text>
+                </View>
+                <View style={[styles.statCard, { backgroundColor: '#7FB3D1' }]}>
+                  <Ionicons name="book-outline" size={28} color="#fff" />
+                  <Text style={styles.statValue}>{statistics.totalCourses}</Text>
+                  <Text style={styles.statLabel}>Total Courses</Text>
+                </View>
+              </View>
+              <View style={styles.statsRow}>
+                <View style={[styles.statCard, { backgroundColor: '#165973' }]}>
+                  <Ionicons name="school-outline" size={28} color="#fff" />
+                  <Text style={styles.statValue}>{statistics.activeClasses}</Text>
+                  <Text style={styles.statLabel}>Active Classes</Text>
+                </View>
+                <View style={[styles.statCard, { backgroundColor: '#7FB3D1' }]}>
+                  <Ionicons name="stats-chart" size={28} color="#fff" />
+                  <Text style={styles.statValue}>{statistics.attendanceRate}%</Text>
+                  <Text style={styles.statLabel}>Attendance Rate</Text>
+                </View>
+              </View>
+            </View>
           </ScrollView>
         );
       case 'courses':
@@ -187,7 +185,42 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     paddingRight: 0,
     marginBottom: 20,
-    marginRight:-2,
+    marginRight: -2,
+  },
+  statsContainer: {
+    padding: 16,
+    gap: 20,
+  },
+  statsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 20,
+  },
+  statCard: {
+    flex: 1,
+    padding: 15,
+    borderRadius: 12,
+    minHeight: 120,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  statValue: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginTop: 10,
+    marginBottom: 5,
+  },
+  statLabel: {
+    fontSize: 14,
+    color: '#fff',
+    opacity: 0.9,
   },
 });
 

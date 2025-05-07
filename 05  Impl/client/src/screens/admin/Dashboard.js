@@ -5,6 +5,7 @@ import {
   StyleSheet,
   SafeAreaView,
   ScrollView,
+  TouchableOpacity,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import TabBar from '../../components/TabBar';
@@ -16,6 +17,7 @@ import { API_URL } from '../../config/api';
 import { ADMIN_CREDENTIALS } from '../../config/auth';
 import Courses from './Courses';
 import Users from './Users';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const Dashboard = () => {
   const navigation = useNavigation();
@@ -167,37 +169,43 @@ const Dashboard = () => {
               data={trendData}
               title="New Accounts Created (Last 7 Days)"
             />
-            <StatisticsChart
-              stats={[
-                {
-                  icon: 'people-outline',
-                  value: statistics.students,
-                  label: 'Students',
-                  backgroundColor: '#165973',
-                  onPress: () => handleStatPress('students')
-                },
-                {
-                  icon: 'school-outline',
-                  value: statistics.instructors,
-                  label: 'Instructors',
-                  backgroundColor: '#7FB3D1',
-                  onPress: () => handleStatPress('students')
-                },
-                {
-                  icon: 'book-outline',
-                  value: statistics.courses,
-                  label: 'Courses',
-                  backgroundColor: '#165973',
-                  onPress: () => handleStatPress('courses')
-                },
-                {
-                  icon: 'stats-chart',
-                  value: `${((statistics.students / (statistics.courses || 1)) || 0).toFixed(1)}`,
-                  label: 'Students per Course',
-                  backgroundColor: '#7FB3D1',
-                }
-              ]}
-            />
+            <View style={styles.statsContainer}>
+              <View style={styles.statsRow}>
+                <TouchableOpacity 
+                  style={[styles.statCard, { backgroundColor: '#165973' }]}
+                  onPress={() => handleStatPress('students')}
+                >
+                  <Ionicons name="people-outline" size={28} color="#fff" />
+                  <Text style={styles.statValue}>{statistics.students}</Text>
+                  <Text style={styles.statLabel}>Students</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={[styles.statCard, { backgroundColor: '#7FB3D1' }]}
+                  onPress={() => handleStatPress('students')}
+                >
+                  <Ionicons name="school-outline" size={28} color="#fff" />
+                  <Text style={styles.statValue}>{statistics.instructors}</Text>
+                  <Text style={styles.statLabel}>Instructors</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.statsRow}>
+                <TouchableOpacity 
+                  style={[styles.statCard, { backgroundColor: '#165973' }]}
+                  onPress={() => handleStatPress('courses')}
+                >
+                  <Ionicons name="book-outline" size={28} color="#fff" />
+                  <Text style={styles.statValue}>{statistics.courses}</Text>
+                  <Text style={styles.statLabel}>Courses</Text>
+                </TouchableOpacity>
+                <View style={[styles.statCard, { backgroundColor: '#7FB3D1' }]}>
+                  <Ionicons name="stats-chart" size={28} color="#fff" />
+                  <Text style={styles.statValue}>
+                    {((statistics.students / (statistics.courses || 1)) || 0).toFixed(1)}
+                  </Text>
+                  <Text style={styles.statLabel}>Students per Course</Text>
+                </View>
+              </View>
+            </View>
           </ScrollView>
         );
       case 'users':
@@ -246,6 +254,41 @@ const styles = StyleSheet.create({
   },
   dashboardContent: {
     flex: 1,
+  },
+  statsContainer: {
+    padding: 16,
+    gap: 20,
+  },
+  statsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 20,
+  },
+  statCard: {
+    flex: 1,
+    padding: 15,
+    borderRadius: 12,
+    minHeight: 120,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  statValue: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginTop: 10,
+    marginBottom: 5,
+  },
+  statLabel: {
+    fontSize: 14,
+    color: '#fff',
+    opacity: 0.9,
   },
 });
 

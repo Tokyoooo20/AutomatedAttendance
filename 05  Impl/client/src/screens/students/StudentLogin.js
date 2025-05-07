@@ -16,7 +16,9 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import { getApiUrl, endpoints } from '../../config/api';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API_URL } from '../../config';
 import CustomAlert from '../../components/CustomAlert';
 
 const { width, height } = Dimensions.get('window');
@@ -49,30 +51,43 @@ const StudentLogin = () => {
   };
 
   const handleLogin = async () => {
-    if (!studentId.trim()) {
-      setError('Please enter your Student ID');
+    if (!studentId.trim() || !password.trim()) {
+      setError('Please enter both Student ID and Password');
       return;
     }
 
     try {
       setIsLoading(true);
-      const response = await fetch(`${getApiUrl()}${endpoints.studentLogin}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ studentId: studentId.trim() }),
+      const response = await axios.post(`${API_URL}/api/students/login`, {
+        studentId: studentId.trim(),
+        password: password.trim()
       });
 
-      const data = await response.json();
+      if (response.data.success) {
+        // Store student data in AsyncStorage
+        await AsyncStorage.multiSet([
+          ['studentId', response.data.student.idNumber],
+          ['studentName', response.data.student.fullName],
+          ['userType', 'student']
+        ]);
 
-      if (response.ok) {
-        navigation.replace('StudentDashboard', { studentId: data.studentId });
+        // Show success message
+        showAlert('Success', 'Login successful!', 'success');
+        
+        // Navigate to dashboard after a short delay
+        setTimeout(() => {
+          navigation.replace('StudentDashboard', { 
+            studentData: {
+              idNumber: response.data.student.idNumber,
+              fullName: response.data.student.fullName
+            }
+          });
+        }, 1500);
       } else {
-        setError(data.message || 'Login failed');
+        setError(response.data.message || 'Login failed');
       }
     } catch (error) {
-      setError('Failed to connect to server');
+      setError(error.response?.data?.message || 'Failed to connect to server');
     } finally {
       setIsLoading(false);
     }

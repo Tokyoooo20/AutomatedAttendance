@@ -3,6 +3,7 @@ const router = express.Router();
 const Student = require('../models/Student');
 const UserLog = require('../models/UserLog');
 const { adminAuth } = require('../middleware/adminAuth');
+const Course = require('../models/Course');
 
 // Test endpoint without auth
 router.get('/test', async (req, res) => {
@@ -200,6 +201,70 @@ router.put('/:id', adminAuth, async (req, res) => {
         });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Get enrolled courses for a student
+router.get('/enrolled-courses/:studentId', async (req, res) => {
+    try {
+        const { studentId } = req.params;
+        console.log('Fetching enrolled courses for student:', studentId);
+
+        // Find student by ID number
+        const student = await Student.findOne({ idNumber: studentId });
+        console.log('Found student:', student);
+
+        if (!student) {
+            return res.status(404).json({ 
+                success: false,
+                message: 'Student not found' 
+            });
+        }
+
+        // Find all courses where student's idNumber is in the students array
+        const courses = await Course.find({
+            students: studentId  // Using the ID number directly since that's what we store
+        });
+        console.log('Found courses:', JSON.stringify(courses, null, 2));
+
+        // Format the response
+        const formattedCourses = await Promise.all(courses.map(async course => {
+            // Get instructor details if needed
+            let instructorName = course.instructor;
+            try {
+                const instructorModel = require('../models/Instructor');
+                const instructorDoc = await instructorModel.findOne({ idNumber: course.instructor });
+                if (instructorDoc) {
+                    instructorName = instructorDoc.fullName;
+                }
+            } catch (err) {
+                console.log('Error fetching instructor:', err);
+            }
+
+            return {
+                id: course._id,
+                courseCode: course.courseCode,
+                courseName: course.courseName,
+                instructor: instructorName,
+                schedule: course.schedule || 'Schedule not set',
+                room: course.room || 'Room not set'
+            };
+        }));
+
+        console.log('Formatted courses:', JSON.stringify(formattedCourses, null, 2));
+
+        res.json({
+            success: true,
+            courses: formattedCourses
+        });
+
+    } catch (error) {
+        console.error('Error in enrolled-courses:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch enrolled courses',
+            error: error.message
+        });
     }
 });
 

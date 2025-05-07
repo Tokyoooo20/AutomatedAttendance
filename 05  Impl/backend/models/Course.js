@@ -26,9 +26,15 @@ const courseSchema = new mongoose.Schema({
         default: generateEnrollmentCode
     },
     students: {
-        type: [String],
+        type: [String], // Store student ID numbers as strings
         default: [],
-        ref: 'Student'
+        validate: {
+            validator: function(v) {
+                // Ensure all values are strings and not empty
+                return v.every(id => typeof id === 'string' && id.length > 0);
+            },
+            message: 'Student IDs must be valid strings'
+        }
     },
     createdAt: {
         type: Date,

@@ -160,11 +160,26 @@ const EnrolledStudent = () => {
     }
   ];
 
-  // Define table headers
+  // Define table headers with widths and alignment
   const headers = [
-    { label: 'ID Number', key: 'idNumber' },
-    { label: 'Name', key: 'fullName' },
-    { label: 'Actions', key: 'actions' }
+    { 
+      label: 'ID Number', 
+      key: 'idNumber',
+      width: '30%',
+      align: 'left'
+    },
+    { 
+      label: 'Name', 
+      key: 'fullName',
+      width: '50%',
+      align: 'left'
+    },
+    { 
+      label: 'Actions', 
+      key: 'actions',
+      width: '20%',
+      align: 'center'
+    }
   ];
 
   // Action buttons for the table
@@ -172,6 +187,7 @@ const EnrolledStudent = () => {
     {
       icon: 'trash-outline',
       color: '#f44336',
+      size: 22,
       onPress: (student) => {
         handleDeleteStudent(student);
       }
@@ -313,11 +329,16 @@ const EnrolledStudent = () => {
           </TouchableOpacity>
         </View>
 
-        <Table
-          headers={headers}
-          data={enrolledStudents}
-          actionButtons={actionButtons}
-        />
+        <View style={styles.tableContainer}>
+          <Table
+            headers={headers}
+            data={enrolledStudents}
+            actionButtons={actionButtons}
+            rowStyle={styles.tableRow}
+            headerStyle={styles.tableHeader}
+            cellStyle={styles.tableCell}
+          />
+        </View>
       </View>
 
       <CustomModal
@@ -366,6 +387,27 @@ const styles = StyleSheet.create({
     color: '#fff',
     marginLeft: 5,
     fontSize: 16,
+  },
+  tableContainer: {
+    flex: 1,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    elevation: 2,
+    overflow: 'hidden',
+  },
+  tableHeader: {
+    backgroundColor: '#f7f7f7',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  tableRow: {
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  tableCell: {
+    paddingHorizontal: 15,
   },
   searchFieldContainer: {
     position: 'relative',

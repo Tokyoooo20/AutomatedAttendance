@@ -10,8 +10,9 @@ import { Ionicons } from '@expo/vector-icons';
 const TabBar = ({
   activeTab = 'dashboard',
   onTabPress,
+  tabs
 }) => {
-  const tabs = [
+  const defaultTabs = [
     {
       key: 'dashboard',
       label: 'Dashboard',
@@ -32,9 +33,11 @@ const TabBar = ({
     }
   ];
 
+  const tabsToRender = tabs || defaultTabs;
+
   return (
     <View style={styles.container}>
-      {tabs.map((tab) => {
+      {tabsToRender.map((tab) => {
         const isActive = activeTab === tab.key;
         return (
           <TouchableOpacity

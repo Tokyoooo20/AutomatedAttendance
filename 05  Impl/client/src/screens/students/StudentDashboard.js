@@ -1,29 +1,72 @@
 import React, { useState } from 'react';
 import {
   View,
-  Text,
   StyleSheet,
   SafeAreaView,
-  TouchableOpacity,
   ActivityIndicator,
   Alert,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { getApiUrl, endpoints } from '../../config/api';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API_URL } from '../../config';
 import CustomAlert from '../../components/CustomAlert';
+import TabBar from '../../components/TabBar';
+import StatisticsChart from '../../components/StatisticsChart';
+import Header from '../../components/Header';
 
 const StudentDashboard = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const studentData = route.params?.studentData || {};
   const [isLoading, setIsLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState('dashboard');
   const [alertConfig, setAlertConfig] = useState({
     visible: false,
     title: '',
     message: '',
     type: 'error'
   });
+
+  const studentTabs = [
+    {
+      key: 'dashboard',
+      label: 'Dashboard',
+      icon: 'home-outline',
+      activeIcon: 'home',
+    },
+    {
+      key: 'courses',
+      label: 'Courses',
+      icon: 'book-outline',
+      activeIcon: 'book',
+    }
+  ];
+
+  const stats = [
+    {
+      icon: 'calendar-outline',
+      value: '85%',
+      label: 'Attendance Rate',
+      backgroundColor: '#165973',
+      onPress: () => console.log('Attendance pressed')
+    },
+    {
+      icon: 'time-outline',
+      value: '12',
+      label: 'Classes Today',
+      backgroundColor: '#1E88E5',
+      onPress: () => console.log('Classes pressed')
+    }
+  ];
+
+  const handleTabPress = (tabKey) => {
+    if (tabKey === 'courses') {
+      navigation.navigate('StudentCourses', { studentData });
+    } else {
+      setActiveTab(tabKey);
+    }
+  };
 
   const showAlert = (title, message, type = 'error') => {
     setAlertConfig({
@@ -42,28 +85,23 @@ const StudentDashboard = () => {
     try {
       setIsLoading(true);
       
-      const response = await fetch(`${getApiUrl()}${endpoints.studentLogout}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          studentId: studentData.idNumber
-        }),
+      const response = await axios.post(`${API_URL}/api/students/logout`, {
+        studentId: studentData.idNumber
       });
 
-      const data = await response.json();
-
-      if (response.ok) {
+      if (response.data.success) {
+        // Clear AsyncStorage
+        await AsyncStorage.multiRemove(['studentId', 'studentName', 'userType']);
+        
         showAlert('Success', 'Logged out successfully', 'success');
         setTimeout(() => {
           navigation.replace('StudentLogin');
         }, 1500);
       } else {
-        throw new Error(data.message || 'Logout failed');
+        throw new Error(response.data.message || 'Logout failed');
       }
-    } catch {
-      Alert.alert('Error', 'Failed to logout');
+    } catch (error) {
+      Alert.alert('Error', error.response?.data?.message || 'Failed to logout');
     } finally {
       setIsLoading(false);
     }
@@ -71,24 +109,25 @@ const StudentDashboard = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.headerContent}>
-          <Text style={styles.welcomeText}>Hi,</Text>
-          <Text style={styles.studentName}>{studentData.fullName || 'Student'}</Text>
+      <Header
+        title={`Hi, ${studentData.fullName || 'Student'}`}
+        subtitle="Welcome to your dashboard"
+        onLogout={isLoading ? null : handleLogout}
+      />
+
+      {/* Main Content */}
+      <View style={styles.content}>
+        <View style={styles.statContainer}>
+          <StatisticsChart stats={stats} />
         </View>
-        <TouchableOpacity 
-          onPress={handleLogout} 
-          style={styles.logoutButton}
-          disabled={isLoading}
-        >
-          {isLoading ? (
-            <ActivityIndicator color="#165973" size="small" />
-          ) : (
-            <Ionicons name="log-out-outline" size={24} color="#165973" />
-          )}
-        </TouchableOpacity>
       </View>
+
+      {/* TabBar */}
+      <TabBar
+        tabs={studentTabs}
+        activeTab={activeTab}
+        onTabPress={handleTabPress}
+      />
 
       <CustomAlert
         visible={alertConfig.visible}
@@ -106,31 +145,29 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f5f5f5',
   },
-  header: {
+  content: {
+    flex: 1,
+    padding: 20,
+  },
+  statContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 20,
+    paddingHorizontal: 10,
+  },
+  statCard: {
+    width: '48%',
     backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
-  headerContent: {
-    flex: 1,
-  },
-  welcomeText: {
-    fontSize: 24,
-    color: '#666',
-    marginBottom: 4,
-  },
-  studentName: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#165973',
-  },
-  logoutButton: {
-    padding: 8,
-  },
+    borderRadius: 10,
+    padding: 15,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  }
 });
 
 export default StudentDashboard; 

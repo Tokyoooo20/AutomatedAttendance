@@ -39,19 +39,18 @@ const StatisticsChart = ({ stats = [] }) => {
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 20,
+    flex: 1,
+    width: '100%',
   },
   grid: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
     justifyContent: 'space-between',
-    marginHorizontal: -5,
+    width: '100%',
   },
   statCard: {
-    width: (Dimensions.get('window').width - 48) / 2,
+    width: '48%',
     padding: 15,
     borderRadius: 12,
-    marginHorizontal: 5,
     marginBottom: 10,
     shadowColor: '#000',
     shadowOffset: {

@@ -4,6 +4,24 @@ const Course = require('../models/Course');
 const Student = require('../models/Student');
 const { adminAuth } = require('../middleware/adminAuth');
 
+// Get available courses for students (public)
+router.get('/available', async (req, res) => {
+    try {
+        const courses = await Course.find();
+        const formattedCourses = courses.map(course => ({
+            _id: course._id,
+            courseCode: course.courseCode,
+            courseName: course.courseName,
+            instructor: course.instructor,
+            totalStudents: course.students ? course.students.length : 0
+        }));
+        res.json(formattedCourses);
+    } catch (error) {
+        console.error('Error fetching available courses:', error);
+        res.status(500).json({ message: error.message });
+    }
+});
+
 // Get all courses (admin only)
 router.get('/', adminAuth, async (req, res) => {
     try {
@@ -115,7 +133,7 @@ router.get('/:id/students', async (req, res) => {
         }
 
         const students = await Student.find({
-            '_id': { $in: course.students }
+            idNumber: { $in: course.students }
         });
 
         res.json(students);
@@ -153,16 +171,16 @@ router.post('/:courseId/enroll-student', async (req, res) => {
             });
         }
 
-        // Check if student is already enrolled
-        if (course.isStudentEnrolled(student._id.toString())) {
+        // Check if student is already enrolled using their ID number
+        if (course.students.includes(student.idNumber)) {
             return res.status(400).json({ 
                 message: 'Student is already enrolled in this course' 
             });
         }
 
-        // Add student to course
+        // Add student's ID number to course
         course.students = course.students || [];
-        course.students.push(student._id.toString());
+        course.students.push(student.idNumber);
         await course.save();
 
         res.json({ 
@@ -188,11 +206,13 @@ router.delete('/:courseId/students/:studentId', adminAuth, async (req, res) => {
             return res.status(404).json({ message: 'Course not found' });
         }
 
-        if (!course.isStudentEnrolled(studentId)) {
+        // Check if student is enrolled using ID number
+        if (!course.students.includes(studentId)) {
             return res.status(400).json({ message: 'Student is not enrolled in this course' });
         }
 
-        course.students = course.students.filter(id => id.toString() !== studentId);
+        // Remove student using ID number
+        course.students = course.students.filter(id => id !== studentId);
         await course.save();
 
         res.json({ message: 'Student removed successfully' });
