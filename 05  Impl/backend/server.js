@@ -5,6 +5,8 @@ const connectDB = require('./config/db');
 const studentRoutes = require('./routes/studentRoutes');
 const instructorRoutes = require('./routes/instructorRoutes');
 const courseRoutes = require('./routes/courseRoutes');
+const attendanceRoutes = require('./routes/attendanceRoutes');
+const sessionAttendanceRoutes = require('./routes/sessionAttendanceRoutes');
 const os = require('os');
 
 const app = express();
@@ -42,6 +44,9 @@ app.get('/', (req, res) => {
 app.use('/api/students', studentRoutes);
 app.use('/api/instructors', instructorRoutes);
 app.use('/api/courses', courseRoutes);
+app.use('/api/attendance', attendanceRoutes);
+app.use('/api/sessions', sessionAttendanceRoutes);
+app.use('/api/session-attendance', sessionAttendanceRoutes);
 
 // Handle 404
 app.use((req, res) => {

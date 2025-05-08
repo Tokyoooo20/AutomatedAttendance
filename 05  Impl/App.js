@@ -12,6 +12,8 @@ import StudentCourses from './client/src/screens/students/StudentCourses';
 import InstructorDashboard from './client/src/screens/instructor/InstructorDashboard';
 import InstructorLogin from './client/src/screens/instructor/InstructorLogin';
 import EnrolledStudent from './client/src/screens/instructor/EnrolledStudent';
+import QRScanner from './client/src/screens/students/QRScanner';
+import ManualAttendance from './client/src/screens/students/ManualAttendance';
 import { AuthProvider } from './client/src/context/AuthContext';
 
 const Stack = createNativeStackNavigator();
@@ -37,6 +39,8 @@ export default function App() {
           <Stack.Screen name="StudentCourses" component={StudentCourses} />
           <Stack.Screen name="InstructorDashboard" component={InstructorDashboard} />
           <Stack.Screen name="EnrolledStudent" component={EnrolledStudent} />
+          <Stack.Screen name="QRScanner" component={QRScanner} />
+          <Stack.Screen name="ManualAttendance" component={ManualAttendance} />
         </Stack.Navigator>
       </NavigationContainer>
     </AuthProvider>

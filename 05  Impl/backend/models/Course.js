@@ -6,6 +6,11 @@ const generateEnrollmentCode = () => {
     return crypto.randomBytes(4).toString('hex').toUpperCase();
 };
 
+// Function to generate a random attendance code
+const generateAttendanceCode = () => {
+    return Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit number
+};
+
 const courseSchema = new mongoose.Schema({
     courseCode: {
         type: String,
@@ -24,6 +29,40 @@ const courseSchema = new mongoose.Schema({
         type: String,
         unique: true,
         default: generateEnrollmentCode
+    },
+    attendanceCode: {
+        type: String,
+        default: generateAttendanceCode
+    },
+    schedules: {
+        type: [{
+            day: {
+                type: String,
+                enum: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+                required: true
+            },
+            startTime: {
+                type: String,
+                required: true
+            },
+            endTime: {
+                type: String,
+                required: true
+            }
+        }],
+        default: []
+    },
+    room: {
+        type: String,
+        default: ''
+    },
+    program: {
+        type: String,
+        default: ''
+    },
+    yearSection: {
+        type: String,
+        default: ''
     },
     students: {
         type: [String], // Store student ID numbers as strings

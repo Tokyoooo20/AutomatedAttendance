@@ -39,7 +39,7 @@ const InstructorCourses = () => {
   const [qrModal, setQrModal] = useState({
     visible: false,
     course: null,
-    timeLeft: 10,
+    timeLeft: 120,
     uniqueCode: '',
     generatedAt: null,
   });
@@ -145,7 +145,7 @@ const InstructorCourses = () => {
     if (!existingCode) return null;
 
     const now = new Date().getTime();
-    const expirationTime = existingCode.generatedAt + (10 * 1000); // 10 seconds in milliseconds
+    const expirationTime = existingCode.generatedAt + (120 * 1000); // 2 minutes in milliseconds (changed from 10 to 120 seconds)
 
     if (now < expirationTime) {
       const timeLeft = Math.ceil((expirationTime - now) / 1000);
@@ -203,7 +203,7 @@ const InstructorCourses = () => {
           setQrModal({
             visible: true,
             course: course,
-            timeLeft: 10,
+            timeLeft: 120,
             uniqueCode: uniqueCode,
             generatedAt: generatedAt,
           });
@@ -213,13 +213,17 @@ const InstructorCourses = () => {
   };
 
   const generateQRValue = (course, uniqueCode, generatedAt) => {
+    // Calculate expiration timestamp (2 minutes from generation time)
+    const expirationTime = new Date(generatedAt + (120 * 1000));
+    
     const qrData = {
       courseId: course._id,
       courseCode: course.courseCode,
       enrollmentCode: course.enrollmentCode,
       uniqueCode: uniqueCode,
       timestamp: new Date(generatedAt).toISOString(),
-      expiresIn: 10, // seconds
+      expiresIn: 120, // Changed from 10 to 120 seconds (2 minutes)
+      expiresAt: expirationTime.toISOString() // Add explicit expiration timestamp
     };
     return JSON.stringify(qrData);
   };
