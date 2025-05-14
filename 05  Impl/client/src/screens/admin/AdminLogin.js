@@ -4,13 +4,12 @@ import {
   Text,
   StyleSheet,
   TextInput,
-  TouchableOpacity,
+  Pressable,
   SafeAreaView,
   Dimensions,
   Image,
   KeyboardAvoidingView,
   Platform,
-  TouchableWithoutFeedback,
   Keyboard,
   ActivityIndicator,
 } from 'react-native';
@@ -83,100 +82,101 @@ const AdminLogin = () => {
   };
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <SafeAreaView style={styles.container}>
-        <View style={styles.background} />
-        
-        {alert.visible && (
-          <CustomAlert
-            type={alert.type}
-            message={alert.message}
-            onClose={() => setAlert({ ...alert, visible: false })}
-          />
-        )}
-        
-        <KeyboardAvoidingView 
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={styles.content}
+    <SafeAreaView style={styles.container}>
+      <Pressable style={styles.background} onPress={Keyboard.dismiss} />
+      
+      {alert.visible && (
+        <CustomAlert
+          type={alert.type}
+          message={alert.message}
+          onClose={() => setAlert({ ...alert, visible: false })}
+        />
+      )}
+      
+      <KeyboardAvoidingView 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.content}
+      >
+        {/* Back Button */}
+        <Pressable 
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
         >
-          {/* Back Button */}
-          <TouchableOpacity 
-            style={styles.backButton}
-            onPress={() => navigation.goBack()}
-          >
-            <Ionicons name="arrow-back" size={28} color="#ffffff" />
-          </TouchableOpacity>
+          <Ionicons name="arrow-back" size={28} color="#ffffff" />
+        </Pressable>
 
-          {/* Header */}
-          <View style={styles.header}>
-            <Image
-              source={require('../../assets/images/logo.png')}
-              style={styles.logo}
-              resizeMode="contain"
+        {/* Header */}
+        <View style={styles.header}>
+          <Image
+            source={require('../../assets/images/logo.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+          <Text style={styles.title}>Admin Login</Text>
+          <Text style={styles.subtitle}>Please login with your admin credentials</Text>
+        </View>
+
+        {/* Login Form */}
+        <View style={styles.form}>
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Admin ID</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter your admin ID"
+              value={adminId}
+              onChangeText={setAdminId}
+              keyboardType="default"
+              autoCapitalize="none"
             />
-            <Text style={styles.title}>Admin Login</Text>
-            <Text style={styles.subtitle}>Please login with your admin credentials</Text>
           </View>
 
-          {/* Login Form */}
-          <View style={styles.form}>
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Admin ID</Text>
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Password</Text>
+            <View style={styles.passwordContainer}>
               <TextInput
-                style={styles.input}
-                placeholder="Enter your admin ID"
-                value={adminId}
-                onChangeText={setAdminId}
-                keyboardType="default"
-                autoCapitalize="none"
+                style={styles.passwordInput}
+                placeholder="Enter your password"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={!showPassword}
               />
-            </View>
-
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Password</Text>
-              <View style={styles.passwordContainer}>
-                <TextInput
-                  style={styles.passwordInput}
-                  placeholder="Enter your password"
-                  value={password}
-                  onChangeText={setPassword}
-                  secureTextEntry={!showPassword}
+              <Pressable
+                style={styles.eyeIcon}
+                onPress={() => setShowPassword(!showPassword)}
+              >
+                <Ionicons
+                  name={showPassword ? 'eye-off' : 'eye'}
+                  size={24}
+                  color="#999999"
                 />
-                <TouchableOpacity
-                  style={styles.eyeIcon}
-                  onPress={() => setShowPassword(!showPassword)}
-                >
-                  <Ionicons
-                    name={showPassword ? 'eye-off' : 'eye'}
-                    size={24}
-                    color="#999999"
-                  />
-                </TouchableOpacity>
-              </View>
+              </Pressable>
             </View>
-
-            <TouchableOpacity style={styles.forgotPassword}>
-              <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity 
-              style={[
-                styles.loginButton,
-                isLoading && styles.loginButtonDisabled
-              ]}
-              onPress={handleLogin}
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <ActivityIndicator color="#fff" size="small" />
-              ) : (
-                <Text style={styles.loginButtonText}>Login</Text>
-              )}
-            </TouchableOpacity>
           </View>
-        </KeyboardAvoidingView>
-      </SafeAreaView>
-    </TouchableWithoutFeedback>
+
+          <Pressable 
+            style={styles.forgotPassword}
+          >
+            <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+          </Pressable>
+
+          <Pressable 
+            style={({pressed}) => [
+              styles.loginButton,
+              isLoading && styles.loginButtonDisabled,
+              pressed && styles.loginButtonPressed
+            ]}
+            onPress={handleLogin}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <ActivityIndicator color="#fff" size="small" />
+            ) : (
+              <Text style={styles.loginButtonText}>Login</Text>
+            )}
+          </Pressable>
+        </View>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 
@@ -286,6 +286,10 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 16,
     alignItems: 'center',
+  },
+  loginButtonPressed: {
+    opacity: 0.8,
+    transform: [{ scale: 0.98 }]
   },
   loginButtonDisabled: {
     backgroundColor: '#165973aa', // Add transparency when disabled

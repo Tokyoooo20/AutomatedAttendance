@@ -1,7 +1,15 @@
 import { Platform } from 'react-native';
 
 // API Configuration
-export const API_URL = 'http://192.168.254.179:5000';
+// IMPORTANT: When changing WiFi networks:
+// 1. Run 'ipconfig' in Command Prompt/PowerShell
+// 2. Find your new IPv4 address
+// 3. Replace the IP address below with your new IP
+export const API_URL = Platform.select({
+  android: 'http://192.168.254.179:5000',    // <- Change this IP address
+  ios: 'http://192.168.254.254:5000',        // <- Change this IP address
+  default: 'http://localhost:5000'           // For web browser
+});
 
 export const endpoints = {
     studentCreate: '/api/students/create',

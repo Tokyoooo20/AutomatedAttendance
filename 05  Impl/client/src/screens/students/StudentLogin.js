@@ -4,13 +4,12 @@ import {
   Text,
   StyleSheet,
   TextInput,
-  TouchableOpacity,
+  Pressable,
   SafeAreaView,
   Dimensions,
   Image,
   KeyboardAvoidingView,
   Platform,
-  TouchableWithoutFeedback,
   Keyboard,
   ActivityIndicator,
 } from 'react-native';
@@ -94,111 +93,113 @@ const StudentLogin = () => {
   };
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <SafeAreaView style={styles.container}>
-        <View style={styles.background} />
-        
-        <KeyboardAvoidingView 
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={styles.content}
+    <SafeAreaView style={styles.container}>
+      <Pressable style={styles.background} onPress={Keyboard.dismiss} />
+      
+      <KeyboardAvoidingView 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.content}
+      >
+        {/* Back Button */}
+        <Pressable 
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
         >
-          {/* Back Button */}
-          <TouchableOpacity 
-            style={styles.backButton}
-            onPress={() => navigation.goBack()}
-          >
-            <Ionicons name="arrow-back" size={28} color="#ffffff" />
-          </TouchableOpacity>
+          <Ionicons name="arrow-back" size={28} color="#ffffff" />
+        </Pressable>
 
-          {/* Header */}
-          <View style={styles.header}>
-            <Image
-              source={require('../../assets/images/logo.png')}
-              style={styles.logo}
-              resizeMode="contain"
+        {/* Header */}
+        <View style={styles.header}>
+          <Image
+            source={require('../../assets/images/logo.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+          <Text style={styles.title}>Student Login</Text>
+          <Text style={styles.subtitle}>Please login with your student credentials</Text>
+        </View>
+
+        {/* Login Form */}
+        <View style={styles.form}>
+          {error ? <Text style={styles.errorText}>{error}</Text> : null}
+
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Student ID</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter your student ID"
+              value={studentId}
+              onChangeText={(text) => {
+                setError('');
+                setStudentId(text);
+              }}
+              keyboardType="default"
+              autoCapitalize="none"
+              editable={!isLoading}
             />
-            <Text style={styles.title}>Student Login</Text>
-            <Text style={styles.subtitle}>Please login with your student credentials</Text>
           </View>
 
-          {/* Login Form */}
-          <View style={styles.form}>
-            {error ? <Text style={styles.errorText}>{error}</Text> : null}
-
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Student ID</Text>
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Password</Text>
+            <View style={styles.passwordContainer}>
               <TextInput
-                style={styles.input}
-                placeholder="Enter your student ID"
-                value={studentId}
+                style={styles.passwordInput}
+                placeholder="Enter your password"
+                value={password}
                 onChangeText={(text) => {
                   setError('');
-                  setStudentId(text);
+                  setPassword(text);
                 }}
-                keyboardType="default"
-                autoCapitalize="none"
+                secureTextEntry={!showPassword}
                 editable={!isLoading}
               />
-            </View>
-
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Password</Text>
-              <View style={styles.passwordContainer}>
-                <TextInput
-                  style={styles.passwordInput}
-                  placeholder="Enter your password"
-                  value={password}
-                  onChangeText={(text) => {
-                    setError('');
-                    setPassword(text);
-                  }}
-                  secureTextEntry={!showPassword}
-                  editable={!isLoading}
+              <Pressable
+                style={styles.eyeIcon}
+                onPress={() => setShowPassword(!showPassword)}
+                disabled={isLoading}
+              >
+                <Ionicons
+                  name={showPassword ? 'eye-off' : 'eye'}
+                  size={24}
+                  color="#999999"
                 />
-                <TouchableOpacity
-                  style={styles.eyeIcon}
-                  onPress={() => setShowPassword(!showPassword)}
-                  disabled={isLoading}
-                >
-                  <Ionicons
-                    name={showPassword ? 'eye-off' : 'eye'}
-                    size={24}
-                    color="#999999"
-                  />
-                </TouchableOpacity>
-              </View>
+              </Pressable>
             </View>
-
-            <TouchableOpacity 
-              style={styles.forgotPassword}
-              disabled={isLoading}
-            >
-              <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity 
-              style={[styles.loginButton, isLoading && styles.loginButtonDisabled]}
-              onPress={handleLogin}
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
-                <Text style={styles.loginButtonText}>Login</Text>
-              )}
-            </TouchableOpacity>
           </View>
-        </KeyboardAvoidingView>
 
-        <CustomAlert
-          visible={alertConfig.visible}
-          title={alertConfig.title}
-          message={alertConfig.message}
-          type={alertConfig.type}
-          onClose={hideAlert}
-        />
-      </SafeAreaView>
-    </TouchableWithoutFeedback>
+          <Pressable 
+            style={styles.forgotPassword}
+            disabled={isLoading}
+          >
+            <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+          </Pressable>
+
+          <Pressable 
+            style={({pressed}) => [
+              styles.loginButton,
+              isLoading && styles.loginButtonDisabled,
+              pressed && styles.loginButtonPressed
+            ]}
+            onPress={handleLogin}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.loginButtonText}>Login</Text>
+            )}
+          </Pressable>
+        </View>
+      </KeyboardAvoidingView>
+
+      <CustomAlert
+        visible={alertConfig.visible}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        type={alertConfig.type}
+        onClose={hideAlert}
+      />
+    </SafeAreaView>
   );
 };
 
@@ -337,6 +338,10 @@ const styles = StyleSheet.create({
   },
   loginButtonDisabled: {
     opacity: 0.7,
+  },
+  loginButtonPressed: {
+    opacity: 0.8,
+    transform: [{ scale: 0.98 }]
   },
 });
 
