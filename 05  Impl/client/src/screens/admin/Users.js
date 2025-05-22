@@ -179,14 +179,27 @@ const Users = ({ onUpdate }) => {
 
   const handleSaveAccount = async (editedAccount) => {
     try {
-      const endpoint = editedAccount.type.toLowerCase() === 'student' ? 'students' : 'instructors';
+      // Use type from selectedAccount since we removed it from the edit form
+      const endpoint = selectedAccount.type.toLowerCase() === 'student' ? 'students' : 'instructors';
       
+      // Validate required fields
+      if (!editedAccount.idNumber || !editedAccount.name) {
+        setAlert({
+          visible: true,
+          type: 'error',
+          message: 'ID Number and Name are required'
+        });
+        return;
+      }
+
       const accountToUpdate = {
         idNumber: editedAccount.idNumber,
-        fullName: editedAccount.name // Using name since that's what we display
+        fullName: editedAccount.name
       };
 
-      const response = await fetch(`${API_URL}/api/${endpoint}/${editedAccount._id}`, {
+      console.log('Updating account:', accountToUpdate);
+
+      const response = await fetch(`${API_URL}/api/${endpoint}/${selectedAccount._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -199,7 +212,7 @@ const Users = ({ onUpdate }) => {
       const responseData = await response.json();
 
       if (response.ok) {
-        fetchAccounts(); // Refresh the accounts list
+        await fetchAccounts(); // Refresh the accounts list
         setIsModalVisible(false);
         setAlert({
           visible: true,
@@ -207,11 +220,7 @@ const Users = ({ onUpdate }) => {
           message: 'Account updated successfully'
         });
       } else {
-        setAlert({
-          visible: true,
-          type: 'error',
-          message: `Failed to update account: ${responseData.message || 'Unknown error'}`
-        });
+        throw new Error(responseData.message || 'Failed to update account');
       }
     } catch (error) {
       console.error('Update error:', error);
@@ -246,7 +255,21 @@ const Users = ({ onUpdate }) => {
       <AccountModal
         visible={isModalVisible}
         onClose={handleModalClose}
-        account={selectedAccount}
+        title="Edit Account"
+        fields={[
+          {
+            key: 'idNumber',
+            label: 'ID Number',
+            value: selectedAccount?.idNumber || '',
+            required: true
+          },
+          {
+            key: 'name',
+            label: 'Full Name',
+            value: selectedAccount?.name || '',
+            required: true
+          }
+        ]}
         onSave={handleSaveAccount}
       />
 

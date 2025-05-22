@@ -332,10 +332,6 @@ const InstructorCourses = () => {
                 />
               )}
             </View>
-            <View style={styles.codeContainer}>
-              <Text style={styles.codeLabel}>Manual Code:</Text>
-              <Text style={styles.codeValue}>{qrModal.uniqueCode}</Text>
-            </View>
             <TouchableOpacity 
               style={styles.closeButton}
               onPress={() => setQrModal(prev => ({ ...prev, visible: false }))}
@@ -481,28 +477,6 @@ const styles = StyleSheet.create({
     color: '#f44336',
     marginBottom: 16,
     fontWeight: '500',
-  },
-  codeContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 16,
-    marginBottom: 20,
-    backgroundColor: '#f5f5f5',
-    padding: 12,
-    borderRadius: 8,
-    width: '100%',
-    justifyContent: 'center',
-  },
-  codeLabel: {
-    fontSize: 16,
-    color: '#666',
-    marginRight: 8,
-  },
-  codeValue: {
-    fontSize: 20,
-    color: '#165973',
-    fontWeight: 'bold',
-    letterSpacing: 2,
   },
   closeButton: {
     backgroundColor: '#165973',
