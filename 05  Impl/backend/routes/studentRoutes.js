@@ -140,12 +140,55 @@ router.post('/logout', async (req, res) => {
 // Route for admin to create a student account
 router.post('/create', adminAuth, async (req, res) => {
     try {
+        // Input validation
+        if (!req.body) {
+            return res.status(400).json({ 
+                success: false,
+                message: "Request body is empty. Please provide student details." 
+            });
+        }
+
         const { idNumber, fullName, password } = req.body;
+
+        // Check for required fields
+        if (!idNumber || !fullName || !password) {
+            return res.status(400).json({ 
+                success: false,
+                message: "Missing required fields. Please provide idNumber, fullName, and password." 
+            });
+        }
+
+        // Validate idNumber format (assuming it should be a string with at least 4 characters)
+        if (typeof idNumber !== 'string' || idNumber.length < 4) {
+            return res.status(400).json({ 
+                success: false,
+                message: "Invalid ID Number format. ID Number should be at least 4 characters long." 
+            });
+        }
+
+        // Validate fullName (should be a string with at least 2 characters)
+        if (typeof fullName !== 'string' || fullName.length < 2) {
+            return res.status(400).json({ 
+                success: false,
+                message: "Invalid full name. Name should be at least 2 characters long." 
+            });
+        }
+
+        // Validate password (should be at least 6 characters)
+        if (typeof password !== 'string' || password.length < 6) {
+            return res.status(400).json({ 
+                success: false,
+                message: "Invalid password. Password should be at least 6 characters long." 
+            });
+        }
 
         // Check if student ID already exists
         const existingStudent = await Student.findOne({ idNumber });
         if (existingStudent) {
-            return res.status(400).json({ message: 'Student ID already exists' });
+            return res.status(400).json({ 
+                success: false,
+                message: 'Student ID already exists' 
+            });
         }
 
         // Create new student
@@ -155,7 +198,9 @@ router.post('/create', adminAuth, async (req, res) => {
             password
         });
 
+        // Return success response
         res.status(201).json({
+            success: true,
             message: 'Student account created successfully',
             student: {
                 idNumber: student.idNumber,
@@ -163,8 +208,13 @@ router.post('/create', adminAuth, async (req, res) => {
             }
         });
 
-    } catch {
-        res.status(500).json({ message: 'Server error' });
+    } catch (error) {
+        console.error('Error creating student:', error);
+        res.status(500).json({ 
+            success: false,
+            message: 'An internal server error occurred while creating the student account.',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
     }
 });
 

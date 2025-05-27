@@ -333,13 +333,6 @@ const StudentCourses = () => {
         <View style={styles.detailsContainer}>
           <View style={styles.instructorRow}>
             <Text numberOfLines={1} style={styles.instructorText}>Instructor: {item.instructor}</Text>
-            <TouchableOpacity 
-              style={styles.manualButton}
-              onPress={() => handleManualCode(item)}
-            >
-              <Ionicons name="keypad-outline" size={24} color="#165973" />
-              <Text style={styles.manualButtonText}>Manual</Text>
-            </TouchableOpacity>
           </View>
           
           <Text style={styles.courseSchedule}>{item.schedule}</Text>
@@ -770,21 +763,6 @@ const styles = StyleSheet.create({
     flex: 1,
     marginRight: 10,
     paddingTop: 0,
-  },
-  manualButton: {
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minWidth: 80,
-    borderRadius: 8,
-    padding: 3,
-    marginTop: -2,
-  },
-  manualButtonText: {
-    color: '#165973',
-    fontSize: 12,
-    marginTop: 1,
-    fontWeight: '500',
   },
   courseSchedule: {
     fontSize: 14,
